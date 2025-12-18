@@ -69,17 +69,43 @@ print(message)  # "Secret data"
 
 ## Project Structure
 ```
-STAGNOGRAPHY ANALIZER/
-├── modules/
-│   ├── image_steg.py      # Image steganography functions
-│   └── audio_steg.py      # Audio steganography functions
-├── utils/
-│   └── helpers.py         # Binary conversion and encryption utilities
-├── gui/
-│   └── main_gui.py        # Tkinter GUI application
-├── tests/                 # Test files and sample media
-├── requirements.txt       # Python dependencies
-└── README.md             # This file
+Unified Cross Modal Audio-Visual Steganography Framework/
+│
+├── app.py                      # FastAPI web application (REST API)
+├── main_gui.py                 # Tkinter desktop GUI application
+├── requirements.txt            # Python dependencies
+├── README.md                   # Project documentation
+├── REFERENCE.md                # Additional references
+├── .gitignore                  # Git ignore rules
+│
+├── modules/                    # Core steganography modules
+│   ├── __init__.py
+│   ├── audio_steg.py          # Audio steganography implementation
+│   └── image_steg.py          # Image steganography implementation
+│
+├── utils/                      # Utility functions
+│   ├── __init__.py
+│   └── helpers.py             # Encryption and file helpers
+│
+├── static/                     # Web interface assets
+│   └── index.html             # Web UI (HTML/CSS/JavaScript)
+│
+├── tests/                      # Unit tests
+│   ├── test_audio.py          # Audio steganography tests
+│   ├── test_image.py          # Image steganography tests
+│   └── test_utils.py          # Utility function tests
+│
+├── run.bat                     # Windows run script
+├── run.sh                      # Linux/Mac run script
+│
+├── Project Report.docx         # Project documentation
+├── PROJECT_PRESENTATION.pdf    # Project presentation
+│
+├── test_audio.wav              # Sample audio file for testing
+├── qwe.png                     # Sample image file
+├── testlk.png                  # Sample image file
+│
+└── .venv/                      # Python virtual environment (generated)
 ```
 
 ## Requirements
