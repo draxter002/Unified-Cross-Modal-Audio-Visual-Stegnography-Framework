@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography Framework - Hide & Extract Secret Messages</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: none;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            opacity: 0.7;
+        }
+        
+        .tab-btn.active {
+            opacity: 1;
+            background: #f8f9fa;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 0 10px 10px 10px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .operation-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .op-btn {
+            flex: 1;
+            padding: 10px;
+            background: #e9ecef;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .op-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button[type="submit"]:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button[type="submit"]:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .capacity-info {
+            padding: 15px;
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .capacity-info.show {
+            display: block;
+        }
+        
+        .result {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .download-link {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        .download-link.show {
+            display: block;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔒 Steganography Framework</h1>
+            <p class="subtitle">Hide and extract secret messages in images and audio files</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('image')">📷 Image Steganography</button>
+            <button class="tab-btn" onclick="switchTab('audio')">🎵 Audio Steganography</button>
+        </div>
+        
+        <!-- Image Tab -->
+        <div id="image-tab" class="tab-content active">
+            <div class="operation-tabs">
+                <button class="op-btn active" onclick="switchOperation('image', 'encode')">Encode Message</button>
+                <button class="op-btn" onclick="switchOperation('image', 'decode')">Decode Message</button>
+            </div>
+            
+            <!-- Image Encode -->
+            <div id="image-encode" class="operation-content">
+                <form id="image-encode-form">
+                    <div class="form-group">
+                        <label>Select Cover Image (PNG/BMP):</label>
+                        <input type="file" id="img-encode-file" accept=".png,.bmp" required onchange="checkImageCapacity(this)">
+                    </div>
+                    
+                    <div id="img-capacity-info" class="capacity-info"></div>
+                    
+                    <div class="form-group">
+                        <label>Secret Message:</label>
+                        <textarea id="img-encode-message" required placeholder="Enter your secret message here..."></textarea>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="img-encode-encrypt" onchange="togglePassword('img-encode')">
+                        <label for="img-encode-encrypt">Encrypt message (optional)</label>
+                    </div>
+                    
+                    <div class="form-group" id="img-encode-pwd-group" style="display: none;">
+                        <label>Password:</label>
+                        <input type="password" id="img-encode-password" placeholder="Enter encryption password">
+                    </div>
+                    
+                    <button type="submit">🔒 Encode Message</button>
+                </form>
+                
+                <div id="img-encode-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Encoding message...</p>
+                </div>
+                
+                <div id="img-encode-result" class="result"></div>
+                <div id="img-encode-download" class="download-link"></div>
+            </div>
+            
+            <!-- Image Decode -->
+            <div id="image-decode" class="operation-content" style="display: none;">
+                <form id="image-decode-form">
+                    <div class="form-group">
+                        <label>Select Stego Image:</label>
+                        <input type="file" id="img-decode-file" accept=".png,.bmp" required>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="img-decode-decrypt" onchange="togglePassword('img-decode')">
+                        <label for="img-decode-decrypt">Message is encrypted</label>
+                    </div>
+                    
+                    <div class="form-group" id="img-decode-pwd-group" style="display: none;">
+                        <label>Password:</label>
+                        <input type="password" id="img-decode-password" placeholder="Enter decryption password">
+                    </div>
+                    
+                    <button type="submit">🔓 Decode Message</button>
+                </form>
+                
+                <div id="img-decode-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Decoding message...</p>
+                </div>
+                
+                <div id="img-decode-result" class="result"></div>
+            </div>
+        </div>
+        
+        <!-- Audio Tab -->
+        <div id="audio-tab" class="tab-content">
+            <div class="operation-tabs">
+                <button class="op-btn active" onclick="switchOperation('audio', 'encode')">Encode Message</button>
+                <button class="op-btn" onclick="switchOperation('audio', 'decode')">Decode Message</button>
+            </div>
+            
+            <!-- Audio Encode -->
+            <div id="audio-encode" class="operation-content">
+                <form id="audio-encode-form">
+                    <div class="form-group">
+                        <label>Select Cover Audio (WAV):</label>
+                        <input type="file" id="aud-encode-file" accept=".wav" required onchange="checkAudioCapacity(this)">
+                    </div>
+                    
+                    <div id="aud-capacity-info" class="capacity-info"></div>
+                    
+                    <div class="form-group">
+                        <label>Secret Message:</label>
+                        <textarea id="aud-encode-message" required placeholder="Enter your secret message here..."></textarea>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="aud-encode-encrypt" onchange="togglePassword('aud-encode')">
+                        <label for="aud-encode-encrypt">Encrypt message (optional)</label>
+                    </div>
+                    
+                    <div class="form-group" id="aud-encode-pwd-group" style="display: none;">
+                        <label>Password:</label>
+                        <input type="password" id="aud-encode-password" placeholder="Enter encryption password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Steganography Key (optional - for advanced hiding):</label>
+                        <input type="text" id="aud-encode-key" placeholder="Leave empty for sequential LSB">
+                    </div>
+                    
+                    <button type="submit">🔒 Encode Message</button>
+                </form>
+                
+                <div id="aud-encode-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Encoding message...</p>
+                </div>
+                
+                <div id="aud-encode-result" class="result"></div>
+                <div id="aud-encode-download" class="download-link"></div>
+            </div>
+            
+            <!-- Audio Decode -->
+            <div id="audio-decode" class="operation-content" style="display: none;">
+                <form id="audio-decode-form">
+                    <div class="form-group">
+                        <label>Select Stego Audio:</label>
+                        <input type="file" id="aud-decode-file" accept=".wav" required>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="aud-decode-decrypt" onchange="togglePassword('aud-decode')">
+                        <label for="aud-decode-decrypt">Message is encrypted</label>
+                    </div>
+                    
+                    <div class="form-group" id="aud-decode-pwd-group" style="display: none;">
+                        <label>Password:</label>
+                        <input type="password" id="aud-decode-password" placeholder="Enter decryption password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Steganography Key (if used during encoding):</label>
+                        <input type="text" id="aud-decode-key" placeholder="Leave empty if no key was used">
+                    </div>
+                    
+                    <button type="submit">🔓 Decode Message</button>
+                </form>
+                
+                <div id="aud-decode-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Decoding message...</p>
+                </div>
+                
+                <div id="aud-decode-result" class="result"></div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 Steganography Framework | Secure Message Hiding</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tab}-tab`).classList.add('active');
+        }
+        
+        // Operation switching
+        function switchOperation(type, op) {
+            const parent = document.getElementById(`${type}-tab`);
+            parent.querySelectorAll('.op-btn').forEach(btn => btn.classList.remove('active'));
+            parent.querySelectorAll('.operation-content').forEach(content => content.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById(`${type}-${op}`).style.display = 'block';
+        }
+        
+        // Toggle password field
+        function togglePassword(prefix) {
+            const checkbox = document.getElementById(`${prefix}-encrypt`) || document.getElementById(`${prefix}-decrypt`);
+            const pwdGroup = document.getElementById(`${prefix}-pwd-group`);
+            pwdGroup.style.display = checkbox.checked ? 'block' : 'none';
+        }
+        
+        // Check capacity
+        async function checkImageCapacity(input) {
+            if (!input.files[0]) return;
+            
+            const formData = new FormData();
+            formData.append('file', input.files[0]);
+            
+            try {
+                const response = await fetch('/api/image/capacity', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                const info = document.getElementById('img-capacity-info');
+                info.innerHTML = `✓ Capacity: ${data.capacity_bytes} bytes (approximately ${data.capacity_chars} characters)`;
+                info.classList.add('show');
+            } catch (error) {
+                console.error('Error checking capacity:', error);
+            }
+        }
+        
+        async function checkAudioCapacity(input) {
+            if (!input.files[0]) return;
+            
+            const formData = new FormData();
+            formData.append('file', input.files[0]);
+            
+            try {
+                const response = await fetch('/api/audio/capacity', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                const info = document.getElementById('aud-capacity-info');
+                info.innerHTML = `✓ Capacity: ${data.capacity_bytes} bytes (approximately ${data.capacity_chars} characters)`;
+                info.classList.add('show');
+            } catch (error) {
+                console.error('Error checking capacity:', error);
+            }
+        }
+        
+        // Form handlers
+        document.getElementById('image-encode-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('img-encode-loading');
+            const result = document.getElementById('img-encode-result');
+            const download = document.getElementById('img-encode-download');
+            
+            loading.classList.add('show');
+            result.classList.remove('show');
+            download.classList.remove('show');
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('img-encode-file').files[0]);
+            formData.append('message', document.getElementById('img-encode-message').value);
+            formData.append('use_encryption', document.getElementById('img-encode-encrypt').checked);
+            
+            if (document.getElementById('img-encode-encrypt').checked) {
+                formData.append('password', document.getElementById('img-encode-password').value);
+            }
+            
+            try {
+                const response = await fetch('/api/image/encode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                loading.classList.remove('show');
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    
+                    result.className = 'result success show';
+                    result.textContent = '✓ Message encoded successfully!';
+                    
+                    download.innerHTML = `<a href="${url}" download="stego_image.png" class="download-btn">📥 Download Stego Image</a>`;
+                    download.classList.add('show');
+                } else {
+                    const error = await response.json();
+                    result.className = 'result error show';
+                    result.textContent = `✗ Error: ${error.detail}`;
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                result.className = 'result error show';
+                result.textContent = `✗ Error: ${error.message}`;
+            }
+        });
+        
+        document.getElementById('image-decode-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('img-decode-loading');
+            const result = document.getElementById('img-decode-result');
+            
+            loading.classList.add('show');
+            result.classList.remove('show');
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('img-decode-file').files[0]);
+            formData.append('use_decryption', document.getElementById('img-decode-decrypt').checked);
+            
+            if (document.getElementById('img-decode-decrypt').checked) {
+                formData.append('password', document.getElementById('img-decode-password').value);
+            }
+            
+            try {
+                const response = await fetch('/api/image/decode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                loading.classList.remove('show');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.className = 'result success show';
+                    result.innerHTML = `<strong>✓ Decoded Message:</strong><br><br>${data.message}`;
+                } else {
+                    result.className = 'result error show';
+                    result.textContent = `✗ Error: ${data.detail}`;
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                result.className = 'result error show';
+                result.textContent = `✗ Error: ${error.message}`;
+            }
+        });
+        
+        document.getElementById('audio-encode-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('aud-encode-loading');
+            const result = document.getElementById('aud-encode-result');
+            const download = document.getElementById('aud-encode-download');
+            
+            loading.classList.add('show');
+            result.classList.remove('show');
+            download.classList.remove('show');
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('aud-encode-file').files[0]);
+            formData.append('message', document.getElementById('aud-encode-message').value);
+            formData.append('use_encryption', document.getElementById('aud-encode-encrypt').checked);
+            
+            if (document.getElementById('aud-encode-encrypt').checked) {
+                formData.append('password', document.getElementById('aud-encode-password').value);
+            }
+            
+            const key = document.getElementById('aud-encode-key').value;
+            if (key) formData.append('steg_key', key);
+            
+            try {
+                const response = await fetch('/api/audio/encode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                loading.classList.remove('show');
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    
+                    result.className = 'result success show';
+                    result.textContent = '✓ Message encoded successfully!';
+                    
+                    download.innerHTML = `<a href="${url}" download="stego_audio.wav" class="download-btn">📥 Download Stego Audio</a>`;
+                    download.classList.add('show');
+                } else {
+                    const error = await response.json();
+                    result.className = 'result error show';
+                    result.textContent = `✗ Error: ${error.detail}`;
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                result.className = 'result error show';
+                result.textContent = `✗ Error: ${error.message}`;
+            }
+        });
+        
+        document.getElementById('audio-decode-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('aud-decode-loading');
+            const result = document.getElementById('aud-decode-result');
+            
+            loading.classList.add('show');
+            result.classList.remove('show');
+            
+            const formData = new FormData();
+            formData.append('file', document.getElementById('aud-decode-file').files[0]);
+            formData.append('use_decryption', document.getElementById('aud-decode-decrypt').checked);
+            
+            if (document.getElementById('aud-decode-decrypt').checked) {
+                formData.append('password', document.getElementById('aud-decode-password').value);
+            }
+            
+            const key = document.getElementById('aud-decode-key').value;
+            if (key) formData.append('steg_key', key);
+            
+            try {
+                const response = await fetch('/api/audio/decode', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                loading.classList.remove('show');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.className = 'result success show';
+                    result.innerHTML = `<strong>✓ Decoded Message:</strong><br><br>${data.message}`;
+                } else {
+                    result.className = 'result error show';
+                    result.textContent = `✗ Error: ${data.detail}`;
+                }
+            } catch (error) {
+                loading.classList.remove('show');
+                result.className = 'result error show';
+                result.textContent = `✗ Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
